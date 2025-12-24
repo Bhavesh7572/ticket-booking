@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import DefaultRoute from "./Guards/DefaultRoute";
+import UserLayout from "./Layout/UserLayout";
+import AdminLayout from "./Layout/AdminLayout";
+import UserDashboard from "./Pages/UserLayout/UserDashboard";
+import MyBooking from "./Pages/UserLayout/MyBooking";
+import UserEvent from "./Pages/UserLayout/UserEvent";
+import Profile from "./Pages/UserLayout/Profile";
+import AdminDashboard from "./Pages/AdminLayout/AdminDashboard";
+import AdminEvent from "./Pages/AdminLayout/AdminEvent";
+import Booking from "./Pages/AdminLayout/Booking";
+import AuthGuard from "./Guards/AuthGuard";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const router = createBrowserRouter([
+    { 
+      path: "/login", 
+      element: <AuthGuard requiredAuth={false} ><Login /></AuthGuard> 
+    },
+    { 
+      path: "/register", 
+      element: <Register /> 
+    },
+    { 
+      path: "/", 
+      element: <DefaultRoute /> 
+    },
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    // User routes
+    {
+      path: "user",
+      element: <AuthGuard requiredAuth={true} allowedRoles={["USER"]}><UserLayout /></AuthGuard>,
+      children: [
+        { path: "dashboard", element: <UserDashboard /> },
+        { path: "my-bookings", element: <MyBooking /> },
+        { path: "event", element: <UserEvent /> },
+        { path: "profile", element: <Profile /> }
+      ]
+    },
+
+    // Admin routes
+    {
+      path: "admin",
+      element: <AuthGuard requiredAuth={true} allowedRoles={["ADMIN"]}><AdminLayout /></AuthGuard>,
+      children: [
+        { path: "dashboard", element: <AdminDashboard /> },
+        { path: "bookings", element: <Booking /> },
+        { path: "event", element: <AdminEvent /> }
+      ]
+    }
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
