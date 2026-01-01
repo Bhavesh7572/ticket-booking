@@ -35,9 +35,9 @@ function App() {
       path: "user",
       element: <AuthGuard requiredAuth={true} allowedRoles={["USER"]}><UserLayout /></AuthGuard>,
       children: [
-        { path: "dashboard", element: <UserDashboard /> },
-        { path: "my-bookings", element: <MyBooking /> },
-        { path: "event", element: <UserEvent /> },
+        { path: "UserDashboard", element: <UserDashboard /> },
+        { path: "MyBooking", element: <MyBooking /> },
+        { path: "UserEvent", element: <UserEvent /> },
         { path: "profile", element: <Profile /> }
       ]
     },
@@ -47,14 +47,17 @@ function App() {
       path: "admin",
       element: <AuthGuard requiredAuth={true} allowedRoles={["ADMIN"]}><AdminLayout /></AuthGuard>,
       children: [
-        { path: "dashboard", element: <AdminDashboard /> },
-        { path: "bookings", element: <Booking /> },
-        { path: "event", element: <AdminEvent /> }
+        { path: "AdminDashboard", element: <AdminDashboard /> },
+        { path: "Booking", element: <Booking /> },
+        { path: "AdminEvent", element: <AdminEvent /> }
       ]
     }
   ]);
 
+  
+
   return <RouterProvider router={router} />;
+  
 }
 
 export default App;

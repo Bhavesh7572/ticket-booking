@@ -1,0 +1,47 @@
+│   .gitignore
+│   eslint.config.js
+│   index.html
+│   package-lock.json
+│   package.json
+│   README.md
+│   vite.config.js
+│
+├───public
+│       vite.svg
+│
+└───src
+    │   App.css
+    │   App.jsx
+    │   index.css
+    │   main.jsx
+    │
+    ├───assets
+    │       react.svg
+    │
+    ├───Guards
+    │       AuthGuard.jsx
+    │       DefaultRoute.jsx
+    │
+    ├───Layout
+    │       AdminLayout.jsx
+    │       UserLayout.jsx
+    │
+    ├───Pages
+    │   │   Login.jsx
+    │   │   Register.jsx
+    │   │
+    │   ├───AdminLayout
+    │   │       AdminDashboard.jsx
+    │   │       AdminEvent.jsx
+    │   │       Booking.jsx
+    │   │       Sidebar.jsx
+    │   │
+    │   └───UserLayout
+    │           Header.jsx
+    │           MyBooking.jsx
+    │           Profile.jsx
+    │           UserDashboard.jsx
+    │           UserEvent.jsx
+    │
+    └───services
+            Apiservice.js

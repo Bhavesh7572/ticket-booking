@@ -7,10 +7,10 @@ const DefaultRoute = () =>{
         return <Navigate to='/login' replace/>
     }
     if(role === "ADMIN"){
-        return <Navigate to='admin/dashboard' replace />
+        return <Navigate to='admin/AdminDashboard' replace />
     }
     if(role === "USER"){
-        return <Navigate to='user/dashboard' replace />
+        return <Navigate to='user/UserDashboard' replace />
     }
 }
 
