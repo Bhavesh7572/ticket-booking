@@ -5,9 +5,9 @@ const SideBar = () => {
   const navigate = useNavigate()
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-    { name: "Bookings", icon: Calendar, path: "/admin/bookings" },
-    { name: "Events", icon: Ticket, path: "/admin/event" },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/AdminDashboard" },
+    { name: "Bookings", icon: Calendar, path: "/admin/Booking" },
+    { name: "Events", icon: Ticket, path: "/admin/AdminEvent" },
   ];
 
   const handleLogoutConfirm = () => {

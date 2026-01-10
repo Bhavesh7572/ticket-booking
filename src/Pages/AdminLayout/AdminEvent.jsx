@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Pencil,
@@ -9,10 +9,12 @@ import {
   DollarSign,
   X
 } from "lucide-react";
+import { Apiservice } from "../../services/Apiservice";
 
 const AdminEvents = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [events, setEvents] = useState([]);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     title: "",
@@ -22,6 +24,14 @@ const AdminEvents = () => {
     capacity: 100,
     price: 0
   });
+
+  useEffect(() => {
+    getAllEvents()
+  },[])
+  useEffect(() => {
+    console.log(formData);
+    
+  }, [formData]);
 
   /* ---------------- INPUT HANDLER ---------------- */
   const handleChange = (field, value) => {
@@ -88,40 +98,44 @@ const AdminEvents = () => {
     setShowModal(true);
   };
 
-  const openEditModal = (event) => {
-    setEditingEvent(event);
-    setErrors({});
-    setFormData(event);
-    setShowModal(true);
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
-
     console.log("Submitting Event Data:", formData);
-
     if (editingEvent) {
-      // Update existing event locally
-      // Logic removed for static demo
-    } else {
-      // Create new event locally
-      // Logic removed for static demo
+      const res = await Apiservice.put(`event/update/${editingEvent.id}`, formData);
+      console.log('updating the event',res);
+    } else { 
+      const res = await Apiservice.post("event/create", formData);
+      console.log('creating the event',res);
     }
-
+    getAllEvents();
     setShowModal(false);
   };
 
-  const handleDelete = (id) => {
-    // Remove event locally
-    // Remove event locally
-    // Logic removed for static demo
+  const openEditModal = (event) => {
+    setEditingEvent(event);
+    setErrors({});
+    setFormData({
+      ...event,
+      date: event.date.split('T')[0] // Format date for input
+    });
+    setShowModal(true);
   };
 
-  const toggleStatus = (event) => {
-    // Toggle status locally
-    // Toggle status locally
-    // Logic removed for static demo
+  const handleDelete = async(id) => {
+    await Apiservice.delete(`event/delete/${id}`);
+    getAllEvents()
   };
+
+  const toggleStatus = async(event) => {
+    await Apiservice.put(`event/update/${event.id}`, { active: !event.active });
+    getAllEvents();
+  };
+
+  const getAllEvents = async() => {
+    const res = await Apiservice.get("event/list")
+    setEvents(res.data)
+  }
 
   /* ---------------- UI ---------------- */
   return (
@@ -142,86 +156,91 @@ const AdminEvents = () => {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-3xl shadow border">
-          <div className="flex justify-between">
-            <div>
-              <h2 className="font-semibold">Summer Music Festival</h2>
-              <span className="text-xs text-green-500">active</span>
-            </div>
+         {events.map((event) => {
+          const progress =
+            ((parseInt(event.booked) / event.capacity) * 100).toFixed(1);
 
-            <div className="flex gap-2">
-              <Pencil
-                onClick={() => openEditModal({
-                  id: 1,
-                  title: "Summer Music Festival",
-                  description: "An amazing outdoor music experience with live bands.",
-                  date: "2024-07-15",
-                  time: "18:00",
-                  capacity: 500,
-                  price: 49.99,
-                  active: true
-                })}
-                className="cursor-pointer text-blue-500"
-              />
-              <Trash2
-                onClick={() => handleDelete(1)}
-                className="cursor-pointer text-red-500"
-              />
-            </div>
-          </div>
-
-          <p className="text-gray-600 mt-2">
-            An amazing outdoor music experience with live bands.
-          </p>
-
-          {/* Info */}
-          <div className="grid grid-cols-2 gap-2 mt-3">
-            <div className="flex items-center gap-2 bg-blue-100 p-2 rounded-full text-sm">
-              <Calendar size={16} />
-              2024-07-15
-            </div>
-
-            <div className="flex items-center gap-2 bg-purple-100 p-2 rounded-full text-sm">
-              <Clock size={16} />
-              18:00
-            </div>
-
-            <div className="flex items-center gap-2 bg-yellow-100 p-2 rounded-full text-sm">
-              <Users size={16} />
-              150 / 500
-            </div>
-
-            <div className="flex items-center gap-2 bg-green-100 p-2 rounded-full text-sm">
-              <DollarSign size={16} />
-              $49.99
-            </div>
-          </div>
-
-          {/* Progress */}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm">
-              <span>Booking</span>
-              <span>30.0%</span>
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full mt-1">
-              <div
-                className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
-                style={{ width: "30%" }}
-              />
-            </div>
-          </div>
-
-          {/* Toggle */}
-          <div className="flex justify-between mt-4 items-center">
-            <span className="text-sm font-medium">Status</span>
-            <button
-              onClick={() => toggleStatus({ id: 1, active: true })}
-              className="w-12 h-6 rounded-full transition-colors duration-200 bg-orange-500"
+          return (
+            <div
+              key={event.id}
+              className="bg-white p-6 rounded-3xl shadow border"
             >
-              <div className="w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ml-1 translate-x-6" />
-            </button>
-          </div>
-        </div>
+              <div className="flex justify-between">
+                <div>
+                  <h2 className="font-semibold">{event.title}</h2>
+                  <span className="text-xs text-red-500">
+                    {event.active ? "active" : "inactive"}
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Pencil
+                    onClick={() => openEditModal(event)}
+                    className="cursor-pointer"
+                  />
+                  <Trash2
+                    onClick={() => handleDelete(event.id)}
+                    className="cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <p className="text-gray-600 mt-2">{event.description}</p>
+
+              {/* Info */}
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="flex items-center gap-2 bg-blue-100 p-2 rounded-full">
+                  <Calendar size={16} />
+                  {event.date.split("T")[0]}
+                </div>
+
+                <div className="flex items-center gap-2 bg-purple-100 p-2 rounded-full">
+                  <Clock size={16} />
+                  {event.time}
+                </div>
+
+                <div className="flex items-center gap-2 bg-yellow-100 p-2 rounded-full">
+                  <Users size={16} />
+                  {event.bookingCount} / {event.capacity}
+                </div>
+
+                <div className="flex items-center gap-2 bg-green-100 p-2 rounded-full">
+                  <DollarSign size={16} />
+                  ${event.price}
+                </div>
+              </div>
+
+              {/* Progress */}
+              <div className="mt-4">
+                <div className="flex justify-between text-sm">
+                  <span>Booking</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full">
+                  <div
+                    className="h-2 bg-indigo-500 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Toggle */}
+              <div className="flex justify-between mt-4 items-center">
+                <span>Status</span>
+                <button
+                  onClick={() => toggleStatus(event)}
+                  className={`w-12 h-6 rounded-full ${event.active ? "bg-orange-500" : "bg-gray-300"
+                    }`}
+                >
+                  <div
+                    className={`w-4 h-4 bg-white rounded-full transform ${event.active ? "translate-x-6" : ""
+                      }`}
+                  />
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Modal */}
@@ -298,7 +317,7 @@ const AdminEvents = () => {
                     type="number"
                     placeholder="Capacity"
                     value={formData.capacity}
-                    onChange={(e) => handleChange("capacity", e.target.value)}
+                    onChange={(e) => handleChange("capacity", Number(e.target.value))}
                     className="w-full p-2 bg-gray-100 rounded-lg border border-transparent focus:bg-white focus:border-orange-500 outline-none transition-colors"
                   />
                   {errors.capacity && (
@@ -311,7 +330,7 @@ const AdminEvents = () => {
                     type="number"
                     placeholder="Price"
                     value={formData.price}
-                    onChange={(e) => handleChange("price", e.target.value)}
+                    onChange={(e) => handleChange("price", Number(e.target.value))}
                     className="w-full p-2 bg-gray-100 rounded-lg border border-transparent focus:bg-white focus:border-orange-500 outline-none transition-colors"
                   />
                   {errors.price && (
@@ -342,4 +361,4 @@ const AdminEvents = () => {
   );
 };
 
-export default AdminEvents; 
+export default AdminEvents;

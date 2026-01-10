@@ -50,14 +50,12 @@ function App() {
         { path: "AdminDashboard", element: <AdminDashboard /> },
         { path: "Booking", element: <Booking /> },
         { path: "AdminEvent", element: <AdminEvent /> }
+        
       ]
     }
-  ]);
-
-  
+  ]);  
 
   return <RouterProvider router={router} />;
-  
 }
 
 export default App;

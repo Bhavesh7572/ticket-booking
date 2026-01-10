@@ -1,13 +1,11 @@
 import React from 'react'
 
 const UserDashboard = () => {
-  return (
-    <div>
-      <p>user dashboard</p>
-      <p>Welcome to TicketHub. Book events and manage your tickets.</p>
-    </div>
-  )
+    return (
+        <div>
+            <p>User Dashboard</p>
+        </div>
+    )
 }
-
 
 export default UserDashboard
